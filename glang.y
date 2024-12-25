@@ -70,18 +70,16 @@ stmt: SEMICOLON
     | if_statement
     { $$ = $1; }
     | block_stmt
+    { $$ = $1; }
     ;
 block_stmt:
     LBRACE 
-    { 
-    //    enterScope(); $<node>$= NULL; 
-    }   // here this is $2.
                         // Why do I need to add a rule here?
                         // Because the execution will continue to analyze
                         // stmt_list before to call enterScope().
     stmt_list RBRACE    // and here it continues
     {
-        $$ = $3;
+        $$ = $2;
      //   exitScope(); 
     }
     ;
@@ -115,31 +113,21 @@ declaration: INT VAR ASSIGN expr SEMICOLON
     }
     | INT VAR SEMICOLON 
     {
-        Variable*p=malloc(sizeof(Variable));
-        p->type=INT_TYPE;
-        p->scope_level= current_scope;
-        printf("a scope: %d\n",current_scope);
-        p->value=malloc(sizeof(int));
-        *(int*)p->value=0;
-         $$ = nodOper(ASSIGN, 2, nodId($2),p); 
+        void*val=malloc(sizeof(int));
+        *(int*)val=0;
+        $$ = nodOper(ASSIGN, 2, nodId($2),nodCon(&val,INT_TYPE)); 
     }
     | FLOAT VAR SEMICOLON 
     {
-        Variable*p=malloc(sizeof(Variable));
-        p->type=FLOAT_TYPE;
-        p->scope_level= current_scope;
-        p->value=malloc(sizeof(float));
-        *(float*)p->value=0.0f;
-         $$ = nodOper(ASSIGN, 2, nodId($2),p); 
+       void*val=malloc(sizeof(float));
+        *(float*)val=0;
+        $$ = nodOper(ASSIGN, 2, nodId($2),nodCon(&val,FLOAT_TYPE)); 
     }
     | DOUBLE VAR SEMICOLON 
     {
-        Variable*p=malloc(sizeof(Variable));
-        p->type=DOUBLE_TYPE;
-        p->scope_level= current_scope;
-        p->value=malloc(sizeof(double));
-        *(double*)p->value=0;
-        $$ = nodOper(ASSIGN, 2, nodId($2),p); 
+       void*val=malloc(sizeof(double));
+        *(double*)val=0;
+        $$ = nodOper(ASSIGN, 2, nodId($2),nodCon(&val, DOUBLE_TYPE)); 
     }
     ; 
 
@@ -155,11 +143,17 @@ if_statement: IF LPAREN expr RPAREN stmt %prec IFX
     ;
 
 expr: INT_VAL
-    { $$ = nodCon(&$1,INT_TYPE); }
+    {   
+        $$ = nodCon(&$1,INT_TYPE); 
+    }
     | FLOAT_VAL
-    { $$ = nodCon(&$1,FLOAT_TYPE); }
+    { 
+        $$ = nodCon(&$1,FLOAT_TYPE); 
+    }
     | DOUBLE_VAL
-    { $$ = nodCon(&$1,DOUBLE_TYPE); }
+    { 
+        $$ = nodCon(&$1,DOUBLE_TYPE); 
+    }
     | VAR
     { $$ = nodId($1); }
     | MINUS expr %prec UMINUS

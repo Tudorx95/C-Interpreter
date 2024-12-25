@@ -70,6 +70,7 @@ typedef struct
 typedef struct nodeTypeTag
 {
     nodeEnum type;
+    int scope_level;
     union
     {
         conNodeType con; // Constant

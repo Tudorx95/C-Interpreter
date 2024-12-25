@@ -18,37 +18,56 @@ void exitScope()
 {
   printf("EXITS SCOPE\n");
   // Șterge toate variabilele din scope-ul curent
-  // for (int i = symCount - 1; i >= 0; i--)
-  // {
-  //   if (sym[i].scope_level == current_scope)
-  //   {
-  //     free(sym[i].value);
-  //     free(sym[i].name);
+  for (int i = symCount - 1; i >= 0; i--)
+  {
+    if (sym[i].scope_level == current_scope)
+    {
+      free(sym[i].value);
+      free(sym[i].name);
 
-  //     // Mutăm ultima variabilă în locul celei șterse
-  //     if (i < symCount - 1)
-  //     {
-  //       sym[i] = sym[symCount - 1];
-  //     }
-  //     symCount--;
-  //   }
-  // }
+      // Mutăm ultima variabilă în locul celei șterse
+      if (i < symCount - 1)
+      {
+        sym[i] = sym[symCount - 1];
+      }
+      symCount--;
+    }
+  }
   current_scope--;
 }
 
 Variable *getVariableValue(const char *name)
 {
   Variable *result = malloc(sizeof(Variable));
+  result->type = 0;
+  result->value = NULL;
+  result->scope_level = 0;
   for (int scope = current_scope; scope >= 0; scope--)
     for (int i = 0; i < symCount; ++i)
     {
       // printf("Type: %d\n", sym[i].type);
-      if (strcmp(sym[i].name, name) == 0 && sym[i].scope_level <= scope)
+      if (sym[i].name && strcmp(sym[i].name, name) == 0 && sym[i].scope_level <= scope)
       {
         result->type = sym[i].type;
+        result->scope_level = sym[i].scope_level;
         // result->value = malloc(sizeof(sym[i].value));
-        result->value = sym[i].value;
-        printf("Getting variable %s with type %d\n", name, sym[i].type);
+        // memcpy(result->value, sym[i].value, sizeof(sym[i].value));
+        switch (sym[i].type)
+        {
+        case INT_TYPE:
+          result->value = malloc(sizeof(int));
+          *(int *)result->value = *(int *)sym[i].value;
+          printf("Getting variable %s with value %d\n", name, *(int *)sym[i].value);
+          break;
+        case FLOAT_TYPE:
+          result->value = malloc(sizeof(float));
+          *(float *)result->value = *(float *)sym[i].value;
+          break;
+        case DOUBLE_TYPE:
+          result->value = malloc(sizeof(double));
+          *(double *)result->value = *(double *)sym[i].value;
+          break;
+        }
         return result;
       }
     }
@@ -59,12 +78,15 @@ Variable *getVariableValue(const char *name)
 
 void setVariableValue(const char *name, Variable *var)
 {
-  printf("Setting variable %s with type %d\n", name, var->type);
+  if (!var)
+    return;
+  printf("Setting variable %s with value %d\n", name, *(int *)var->value);
   for (int i = 0; i < symCount; ++i)
   {
     if (strcmp(sym[i].name, name) == 0 && sym[i].scope_level == current_scope)
     {
       sym[i].type = var->type;
+      sym[i].scope_level = var->scope_level;
 
       if (sym[i].value)
         free(sym[i].value);
@@ -128,8 +150,8 @@ nodeType *nodCon(void *value, DataType typeVar)
   /* copiere valoare constanta */
   p->type = typeCon;
   p->con.type = typeVar;
-  // p->scope_level = current_scope;
-  printf("DEBUG: Current_scope: %d\n", current_scope);
+  p->scope_level = current_scope;
+  printf("DEBUG nodCon: Current_scope: %d\n", current_scope);
   if (typeVar == INT_TYPE)
   {
     p->con.iVal = *(int *)value;
@@ -160,8 +182,8 @@ nodeType *nodId(const char *name)
 
   /* Copy variable name */
   p->type = typeId;
-  // p->scope_level = current_scope;
-  printf("DEBUG: Current_scope: %d\n", current_scope);
+  p->scope_level = current_scope;
+  printf("DEBUG nodID: Current_scope: %d\n", current_scope);
   /* Store name in allocated memory after the node */
   strcpy(p->id.name, name);
 
@@ -183,6 +205,7 @@ nodeType *nodOper(int oper, int nops, ...)
   p->type = typeOper;
   p->opr.oper = oper;
   p->opr.nops = nops;
+  p->scope_level = current_scope;
   va_start(ap, nops);
   for (i = 0; i < nops; i++)
     p->opr.op[i] = va_arg(ap, nodeType *);
@@ -418,7 +441,9 @@ Variable *interpret(nodeType *p)
   switch (p->type)
   {
   case typeCon:
+  {
     result->type = p->con.type;
+    result->scope_level = p->scope_level;
     switch (p->con.type)
     {
     case INT_TYPE:
@@ -433,13 +458,17 @@ Variable *interpret(nodeType *p)
       result->value = malloc(sizeof(double));
       *(double *)result->value = p->con.dVal;
       break;
+    default:
+      result->value = NULL;
     }
     return result;
+  }
 
   case typeId:
     return getVariableValue(p->id.name);
 
   case typeOper:
+  {
     switch (p->opr.oper)
     {
     case WHILE:
@@ -465,7 +494,7 @@ Variable *interpret(nodeType *p)
     case PRINT:
     {
       Variable *val = interpret(p->opr.op[0]);
-      if (!val || !val->value)
+      if (!val || !val->value || val->scope_level != p->scope_level)
       {
         printf("Error: Variable not found or has null value.\n");
         return NULL;
@@ -593,6 +622,7 @@ Variable *interpret(nodeType *p)
       // interpret(p->opr.op[0]) ==
       //        interpret(p->opr.op[1]);
     }
+  }
   }
   return result;
 }
