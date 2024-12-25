@@ -100,37 +100,37 @@ print_statement: PRINT expr SEMICOLON
     ;
 
 assignment: VAR ASSIGN expr SEMICOLON
-    { $$ = nodOper(ASSIGN, 2, nodId($1), $3); }
+    { $$ = nodOper(ASSIGN, 2, nodId($1,OTHER_TYPE), $3); }
     ;
 declaration: INT VAR ASSIGN expr SEMICOLON 
     { 
-        $$ = nodOper(ASSIGN, 2, nodId($2), $4);
+        $$ = nodOper(ASSIGN, 2, nodId($2,INT_TYPE), $4);
     }
     | FLOAT VAR ASSIGN expr SEMICOLON 
     {      
-            $$ = nodOper(ASSIGN, 2, nodId($2), $4);
+            $$ = nodOper(ASSIGN, 2, nodId($2,FLOAT_TYPE), $4);
     }
     | DOUBLE VAR ASSIGN expr SEMICOLON
     {
-         $$ = nodOper(ASSIGN, 2, nodId($2), $4);
+         $$ = nodOper(ASSIGN, 2, nodId($2,DOUBLE_TYPE), $4);
     }
     | INT VAR SEMICOLON 
     {
         void*val=malloc(sizeof(int));
         *(int*)val=0;
-        $$ = nodOper(ASSIGN, 2, nodId($2),nodCon(&val,INT_TYPE)); 
+        $$ = nodOper(ASSIGN, 2, nodId($2,INT_TYPE),nodCon(&val,INT_TYPE)); 
     }
     | FLOAT VAR SEMICOLON 
     {
        void*val=malloc(sizeof(float));
         *(float*)val=0;
-        $$ = nodOper(ASSIGN, 2, nodId($2),nodCon(&val,FLOAT_TYPE)); 
+        $$ = nodOper(ASSIGN, 2, nodId($2,FLOAT_TYPE),nodCon(&val,FLOAT_TYPE)); 
     }
     | DOUBLE VAR SEMICOLON 
     {
        void*val=malloc(sizeof(double));
         *(double*)val=0;
-        $$ = nodOper(ASSIGN, 2, nodId($2),nodCon(&val, DOUBLE_TYPE)); 
+        $$ = nodOper(ASSIGN, 2, nodId($2,DOUBLE_TYPE),nodCon(&val, DOUBLE_TYPE)); 
     }
     ; 
 
@@ -158,7 +158,7 @@ expr: INT_VAL
         $$ = nodCon(&$1,DOUBLE_TYPE); 
     }
     | VAR
-    { $$ = nodId($1); }
+    { $$ = nodId($1,OTHER_TYPE); }
     | MINUS expr %prec UMINUS
     { $$ = nodOper(UMINUS, 1, $2); }
     | expr PLUS expr
@@ -188,6 +188,18 @@ expr: INT_VAL
     { $$ = nodOper(NOTEQUAL, 2, $1, $3); }
     | expr EQUAL expr
     { $$ = nodOper(EQUAL, 2, $1, $3); }
+    | LPAREN INT RPAREN expr %prec UMINUS
+    {
+        $$ = $4;
+    }
+    | LPAREN FLOAT RPAREN expr %prec UMINUS
+    {
+        $$ = $4;
+    }
+    | LPAREN DOUBLE RPAREN expr %prec UMINUS
+    {
+        $$ = $4;
+    }
     | LPAREN expr RPAREN
     { $$ = $2; }
     ;

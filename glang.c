@@ -76,7 +76,7 @@ Variable *getVariableValue(const char *name, int scope)
   return NULL;
 }
 
-void setVariableValue(const char *name, Variable *var)
+void setVariableValue(const char *name, DataType type, Variable *var)
 {
   if (!var)
     return;
@@ -87,28 +87,80 @@ void setVariableValue(const char *name, Variable *var)
     printf("SYMNAME: %s, SYM_SCOPE: %d, VAR_SCOPE: %d\n", sym[i].name, sym[i].scope_level, var->scope_level);
     if (strcmp(sym[i].name, name) == 0 && sym[i].scope_level <= var->scope_level)
     {
-      printf("Variable EXISTS\n");
-      sym[i].type = var->type;
+      printf("Variable EXISTS. SYM Type: %d, VAR Type: %d\n", sym[i].type, var->type);
+      // if the var exists, the type must remain the same, and a cast may be made
+      // sym[i].type = var->type;
       // sym[i].scope_level = var->scope_level;
 
+      // here cast the var
       if (sym[i].value)
         free(sym[i].value);
-
+      sym[i].value = malloc(4);
       switch (var->type)
       {
       case INT_TYPE:
-        sym[i].value = malloc(sizeof(int));
-        *(int *)sym[i].value = *(int *)var->value;
+        switch (sym[i].type)
+        {
+        case INT_TYPE:
+          *(int *)sym[i].value = *(int *)var->value;
+          break;
+        case FLOAT_TYPE:
+          *(float *)sym[i].value = (float)*(int *)var->value;
+          break;
+        case DOUBLE_TYPE:
+          *(double *)sym[i].value = (double)*(int *)var->value;
+          break;
+        default:
+        }
         break;
       case FLOAT_TYPE:
-        sym[i].value = malloc(sizeof(float));
-        *(float *)sym[i].value = *(float *)var->value;
+        switch (sym[i].type)
+        {
+        case INT_TYPE:
+          *(int *)sym[i].value = (int)*(float *)var->value;
+          break;
+        case FLOAT_TYPE:
+          *(float *)sym[i].value = *(float *)var->value;
+          break;
+        case DOUBLE_TYPE:
+          *(double *)sym[i].value = (double)*(float *)var->value;
+          break;
+        default:
+        }
         break;
       case DOUBLE_TYPE:
-        sym[i].value = malloc(sizeof(double));
-        *(double *)sym[i].value = *(double *)var->value;
+        switch (sym[i].type)
+        {
+        case INT_TYPE:
+          *(int *)sym[i].value = (int)*(double *)var->value;
+          break;
+        case FLOAT_TYPE:
+          *(float *)sym[i].value = (float)*(double *)var->value;
+          break;
+        case DOUBLE_TYPE:
+          *(double *)sym[i].value = *(double *)var->value;
+          break;
+        default:
+        }
         break;
+      default:
       }
+
+      // switch (var->type)
+      // {
+      // case INT_TYPE:
+      //   sym[i].value = malloc(sizeof(int));
+      //   *(int *)sym[i].value = *(int *)var->value;
+      //   break;
+      // case FLOAT_TYPE:
+      //   sym[i].value = malloc(sizeof(float));
+      //   *(float *)sym[i].value = *(float *)var->value;
+      //   break;
+      // case DOUBLE_TYPE:
+      //   sym[i].value = malloc(sizeof(double));
+      //   *(double *)sym[i].value = *(double *)var->value;
+      //   break;
+      // }
       return;
     }
   }
@@ -120,24 +172,75 @@ void setVariableValue(const char *name, Variable *var)
   }
   printf("Variable NOT EXISTS! SymCount: %d VarName: %s Curr_scope: %d\n", symCount, name, current_scope);
   sym[symCount].name = strdup(name);
-  sym[symCount].type = var->type;
+  // if the var is new, then assign the current type
+  sym[symCount].type = (type == OTHER_TYPE ? var->type : type);
   sym[symCount].scope_level = var->scope_level;
   printf("Var current Scope: %d\n", current_scope);
+  sym[symCount].value = malloc(4);
   switch (var->type)
   {
   case INT_TYPE:
-    sym[symCount].value = malloc(sizeof(int));
-    *(int *)sym[symCount].value = *(int *)var->value;
+    switch (sym[symCount].type)
+    {
+    case INT_TYPE:
+      *(int *)sym[symCount].value = *(int *)var->value;
+      break;
+    case FLOAT_TYPE:
+      *(float *)sym[symCount].value = (float)*(int *)var->value;
+      break;
+    case DOUBLE_TYPE:
+      *(double *)sym[symCount].value = (double)*(int *)var->value;
+      break;
+    default:
+    }
     break;
   case FLOAT_TYPE:
-    sym[symCount].value = malloc(sizeof(float));
-    *(float *)sym[symCount].value = *(float *)var->value;
+    switch (sym[symCount].type)
+    {
+    case INT_TYPE:
+      *(int *)sym[symCount].value = (int)*(float *)var->value;
+      break;
+    case FLOAT_TYPE:
+      *(float *)sym[symCount].value = *(float *)var->value;
+      break;
+    case DOUBLE_TYPE:
+      *(double *)sym[symCount].value = (double)*(float *)var->value;
+      break;
+    default:
+    }
     break;
   case DOUBLE_TYPE:
-    sym[symCount].value = malloc(sizeof(double));
-    *(double *)sym[symCount].value = *(double *)var->value;
+    switch (sym[symCount].type)
+    {
+    case INT_TYPE:
+      *(int *)sym[symCount].value = (int)*(double *)var->value;
+      break;
+    case FLOAT_TYPE:
+      *(float *)sym[symCount].value = (float)*(double *)var->value;
+      break;
+    case DOUBLE_TYPE:
+      *(double *)sym[symCount].value = *(double *)var->value;
+      break;
+    default:
+    }
     break;
+  default:
   }
+  // switch (var->type)
+  // {
+  // case INT_TYPE:
+  //   sym[symCount].value = malloc(sizeof(int));
+  //   *(int *)sym[symCount].value = *(int *)var->value;
+  //   break;
+  // case FLOAT_TYPE:
+  //   sym[symCount].value = malloc(sizeof(float));
+  //   *(float *)sym[symCount].value = *(float *)var->value;
+  //   break;
+  // case DOUBLE_TYPE:
+  //   sym[symCount].value = malloc(sizeof(double));
+  //   *(double *)sym[symCount].value = *(double *)var->value;
+  //   break;
+  // }
 
   ++symCount;
 }
@@ -174,7 +277,7 @@ nodeType *nodCon(void *value, DataType typeVar)
   return p;
 }
 
-nodeType *nodId(const char *name)
+nodeType *nodId(const char *name, DataType type)
 {
   nodeType *p;
   size_t nodeSize;
@@ -190,6 +293,7 @@ nodeType *nodId(const char *name)
   printf("DEBUG nodID: Current_scope: %d\n", current_scope);
   /* Store name in allocated memory after the node */
   strcpy(p->id.name, name);
+  p->id.type = type;
 
   return p;
 }
@@ -583,7 +687,7 @@ Variable *interpret(nodeType *p)
       return interpret(p->opr.op[1]);
 
     case ASSIGN:
-      setVariableValue(p->opr.op[0]->id.name, interpret(p->opr.op[1])); // Assign value to variable
+      setVariableValue(p->opr.op[0]->id.name, p->opr.op[0]->id.type, interpret(p->opr.op[1])); // Assign value to variable
       return getVariableValue(p->opr.op[0]->id.name, p->opr.op[0]->scope_level);
 
     case UMINUS:
@@ -628,6 +732,8 @@ Variable *interpret(nodeType *p)
       return determineCondition("==", interpret(p->opr.op[0]), interpret(p->opr.op[1]));
       // interpret(p->opr.op[0]) ==
       //        interpret(p->opr.op[1]);
+    default:
+      return NULL;
     }
   }
   }

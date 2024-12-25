@@ -21,3 +21,7 @@ int x = 10;
     printf(b);
 }
 printf(a);
+
+double p = 10.2;
+float d = (float)p;
+printf(d);

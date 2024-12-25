@@ -22,7 +22,8 @@ typedef enum
 {
     INT_TYPE,
     FLOAT_TYPE,
-    DOUBLE_TYPE
+    DOUBLE_TYPE,
+    OTHER_TYPE
 } DataType;
 
 /* Constants */
@@ -40,6 +41,7 @@ typedef struct
 /* Identifiers */
 typedef struct
 {
+    DataType type;
     char name[32]; // Variable name
 } idNodeType;
 
@@ -84,7 +86,7 @@ nodeType *nodOper(int oper, int nops, ...);
 Variable *performArithmetic(char oper, Variable *left, Variable *right);
 /* nod operator in arbore
  */
-nodeType *nodId(const char *name);
+nodeType *nodId(const char *name, DataType type);
 /* nod frunza identificator
  */
 nodeType *nodCon(void *value, DataType typeVar);
@@ -97,7 +99,7 @@ Variable *interpret(nodeType *p);
 /* functia de interpretare*/
 
 Variable *getVariableValue(const char *name, int scope);
-void setVariableValue(const char *name, Variable *value);
+void setVariableValue(const char *name, DataType type, Variable *value);
 Variable *determineCondition(const char *typeOp, Variable *left, Variable *right);
 Variable *negateValue(Variable *val);
 void freeVars();
