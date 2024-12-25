@@ -18,59 +18,59 @@ void exitScope()
 {
   printf("EXITS SCOPE\n");
   // Șterge toate variabilele din scope-ul curent
-  for (int i = symCount - 1; i >= 0; i--)
-  {
-    if (sym[i].scope_level == current_scope)
-    {
-      free(sym[i].value);
-      free(sym[i].name);
+  // for (int i = symCount - 1; i >= 0; i--)
+  // {
+  //   if (sym[i].scope_level == current_scope)
+  //   {
+  //     free(sym[i].value);
+  //     free(sym[i].name);
 
-      // Mutăm ultima variabilă în locul celei șterse
-      if (i < symCount - 1)
-      {
-        sym[i] = sym[symCount - 1];
-      }
-      symCount--;
-    }
-  }
+  //     // Mutăm ultima variabilă în locul celei șterse
+  //     if (i < symCount - 1)
+  //     {
+  //       sym[i] = sym[symCount - 1];
+  //     }
+  //     symCount--;
+  //   }
+  // }
   current_scope--;
 }
 
-Variable *getVariableValue(const char *name)
+Variable *getVariableValue(const char *name, int scope)
 {
   Variable *result = malloc(sizeof(Variable));
   result->type = 0;
   result->value = NULL;
   result->scope_level = 0;
-  for (int scope = current_scope; scope >= 0; scope--)
-    for (int i = 0; i < symCount; ++i)
+  // for (int scope = current_scope; scope >= 0; scope--)
+  for (int i = 0; i < symCount; ++i)
+  {
+    // printf("Type: %d\n", sym[i].type);
+    if (sym[i].name && strcmp(sym[i].name, name) == 0 && sym[i].scope_level <= scope) // && sym[i].scope_level <= scope)
     {
-      // printf("Type: %d\n", sym[i].type);
-      if (sym[i].name && strcmp(sym[i].name, name) == 0 && sym[i].scope_level <= scope)
+      result->type = sym[i].type;
+      result->scope_level = sym[i].scope_level;
+      // result->value = malloc(sizeof(sym[i].value));
+      // memcpy(result->value, sym[i].value, sizeof(sym[i].value));
+      switch (sym[i].type)
       {
-        result->type = sym[i].type;
-        result->scope_level = sym[i].scope_level;
-        // result->value = malloc(sizeof(sym[i].value));
-        // memcpy(result->value, sym[i].value, sizeof(sym[i].value));
-        switch (sym[i].type)
-        {
-        case INT_TYPE:
-          result->value = malloc(sizeof(int));
-          *(int *)result->value = *(int *)sym[i].value;
-          printf("Getting variable %s with value %d\n", name, *(int *)sym[i].value);
-          break;
-        case FLOAT_TYPE:
-          result->value = malloc(sizeof(float));
-          *(float *)result->value = *(float *)sym[i].value;
-          break;
-        case DOUBLE_TYPE:
-          result->value = malloc(sizeof(double));
-          *(double *)result->value = *(double *)sym[i].value;
-          break;
-        }
-        return result;
+      case INT_TYPE:
+        result->value = malloc(sizeof(int));
+        *(int *)result->value = *(int *)sym[i].value;
+        printf("Getting variable %s with value %d\n", name, *(int *)sym[i].value);
+        break;
+      case FLOAT_TYPE:
+        result->value = malloc(sizeof(float));
+        *(float *)result->value = *(float *)sym[i].value;
+        break;
+      case DOUBLE_TYPE:
+        result->value = malloc(sizeof(double));
+        *(double *)result->value = *(double *)sym[i].value;
+        break;
       }
+      return result;
     }
+  }
   printf("Error: Variable '%s' not defined.\n", name);
   free(result);
   return NULL;
@@ -83,10 +83,13 @@ void setVariableValue(const char *name, Variable *var)
   printf("Setting variable %s with value %d\n", name, *(int *)var->value);
   for (int i = 0; i < symCount; ++i)
   {
-    if (strcmp(sym[i].name, name) == 0 && sym[i].scope_level == current_scope)
+    // if variable exists verify if it has the same scope
+    printf("SYMNAME: %s, SYM_SCOPE: %d, VAR_SCOPE: %d\n", sym[i].name, sym[i].scope_level, var->scope_level);
+    if (strcmp(sym[i].name, name) == 0 && sym[i].scope_level <= var->scope_level)
     {
+      printf("Variable EXISTS\n");
       sym[i].type = var->type;
-      sym[i].scope_level = var->scope_level;
+      // sym[i].scope_level = var->scope_level;
 
       if (sym[i].value)
         free(sym[i].value);
@@ -115,9 +118,10 @@ void setVariableValue(const char *name, Variable *var)
     printf("Error: Maximum number of variables exceeded.\n");
     exit(EXIT_FAILURE);
   }
+  printf("Variable NOT EXISTS! SymCount: %d VarName: %s Curr_scope: %d\n", symCount, name, current_scope);
   sym[symCount].name = strdup(name);
   sym[symCount].type = var->type;
-  sym[symCount].scope_level = current_scope;
+  sym[symCount].scope_level = var->scope_level;
   printf("Var current Scope: %d\n", current_scope);
   switch (var->type)
   {
@@ -245,6 +249,8 @@ Variable *performArithmetic(char oper, Variable *left, Variable *right)
     yyerror("Memory allocation failed.");
     exit(EXIT_FAILURE);
   }
+  // setting the max scope
+  result->scope_level = (left->scope_level > right->scope_level ? left->scope_level : right->scope_level);
 
   double leftVal, rightVal, resVal;
   if (left->type == INT_TYPE)
@@ -265,6 +271,7 @@ Variable *performArithmetic(char oper, Variable *left, Variable *right)
   {
   case '+':
     resVal = leftVal + rightVal;
+    printf("Perform arithmetic value: %d\n", (int)resVal);
     break;
   case '-':
     resVal = leftVal - rightVal;
@@ -465,7 +472,7 @@ Variable *interpret(nodeType *p)
   }
 
   case typeId:
-    return getVariableValue(p->id.name);
+    return getVariableValue(p->id.name, p->scope_level);
 
   case typeOper:
   {
@@ -494,7 +501,7 @@ Variable *interpret(nodeType *p)
     case PRINT:
     {
       Variable *val = interpret(p->opr.op[0]);
-      if (!val || !val->value || val->scope_level != p->scope_level)
+      if (!val || !val->value)
       {
         printf("Error: Variable not found or has null value.\n");
         return NULL;
@@ -577,7 +584,7 @@ Variable *interpret(nodeType *p)
 
     case ASSIGN:
       setVariableValue(p->opr.op[0]->id.name, interpret(p->opr.op[1])); // Assign value to variable
-      return getVariableValue(p->opr.op[0]->id.name);
+      return getVariableValue(p->opr.op[0]->id.name, p->opr.op[0]->scope_level);
 
     case UMINUS:
       return negateValue(interpret(p->opr.op[0]));

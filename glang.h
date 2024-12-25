@@ -96,7 +96,7 @@ void freeNode(nodeType *p);
 Variable *interpret(nodeType *p);
 /* functia de interpretare*/
 
-Variable *getVariableValue(const char *name);
+Variable *getVariableValue(const char *name, int scope);
 void setVariableValue(const char *name, Variable *value);
 Variable *determineCondition(const char *typeOp, Variable *left, Variable *right);
 Variable *negateValue(Variable *val);

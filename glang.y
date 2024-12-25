@@ -74,13 +74,16 @@ stmt: SEMICOLON
     ;
 block_stmt:
     LBRACE 
+    { 
+        enterScope();
+    }
                         // Why do I need to add a rule here?
                         // Because the execution will continue to analyze
                         // stmt_list before to call enterScope().
     stmt_list RBRACE    // and here it continues
     {
-        $$ = $2;
-     //   exitScope(); 
+       exitScope(); 
+        $$ = $3;
     }
     ;
 
