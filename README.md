@@ -91,7 +91,8 @@ Enter to start (or analyze a program: run <script_name> or <exit> to shutdown th
 This is the program interface and the user may press enter and run its appropriate commands or use the command "run <program_name>" and
 analyze its appropriate C program.
 
-After the command "run <program_name>" the user must press enter to return to the menu.
+After the command "run <program_name>" the user must press enter to return to the menu. A program test written in for this interpreter
+is "program.c" file. To run the interpreter with this file just tap "run program.c".
 After the pressing enter, the user can return to the menu by pressing CTRL-C command (SIGINT signal that is handled) and then press enter.
 The program can be stopped only with "exit" command.
 
