@@ -89,7 +89,8 @@ extern int yydebug;
     GREATEREQUAL = 290,            /* GREATEREQUAL  */
     LESS = 291,                    /* LESS  */
     GREATER = 292,                 /* GREATER  */
-    UMINUS = 293                   /* UMINUS  */
+    UMINUS = 293,                  /* UMINUS  */
+    FUNCTION = 294                 /* FUNCTION  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -106,7 +107,7 @@ union YYSTYPE
     char *sval;
     nodeType *node;
 
-#line 110 "glang.tab.h"
+#line 111 "glang.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

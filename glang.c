@@ -2,6 +2,55 @@
 #include "glang.tab.h"
 #include <stddef.h>
 
+FunctionTable functionTable = {0};
+void addFunction(const char *name, DataType returnType, nodeType *body)
+{
+  Function *func = &functionTable.functions[functionTable.count];
+  strncpy(func->name, name, sizeof(func->name) - 1);
+  func->returnType = returnType;
+  func->body = body;
+  functionTable.count++;
+}
+
+Function *findFunction(const char *name)
+{
+  for (int i = 0; i < functionTable.count; i++)
+  {
+    if (strcmp(functionTable.functions[i].name, name) == 0)
+    {
+      return &functionTable.functions[i];
+    }
+  }
+  return NULL;
+}
+
+Variable *callFunction(const char *name, Variable **args, int argCount)
+{
+  Function *func = findFunction(name);
+  if (!func)
+  {
+    yyerror("Function not found");
+    return NULL;
+  }
+
+  // Create new scope for function
+  enterScope();
+
+  // Bind arguments to parameters using parameter names
+  for (int i = 0; i < argCount && i < func->paramCount; i++)
+  {
+    setVariableValue(func->paramNames[i], args[i]->type, args[i]);
+  }
+
+  // Execute function body
+  Variable *result = interpret(func->body);
+
+  // Clean up scope
+  exitScope();
+
+  return result;
+}
+
 Variable sym[MAX_VARS];
 int symCount = 0;
 
@@ -582,6 +631,35 @@ Variable *interpret(nodeType *p)
   {
     switch (p->opr.oper)
     {
+
+    case FUNCTION:
+    {
+      // Handle function call
+      char *funcName = p->opr.op[0]->id.name;
+      nodeType *args = p->opr.op[1];
+
+      // Evaluate arguments
+      Variable *argValues[10]; // Max 10 arguments
+      int argCount = 0;
+
+      nodeType *current = args;
+      while (current && argCount < 10)
+      {
+        if (current->type == typeOper && current->opr.oper == COMMA)
+        {
+          argValues[argCount++] = interpret(current->opr.op[1]);
+          current = current->opr.op[0];
+        }
+        else
+        {
+          argValues[argCount++] = interpret(current);
+          break;
+        }
+      }
+
+      return callFunction(funcName, argValues, argCount);
+    }
+
     case WHILE:
       // here is an expression that returns an int value
       while (*(int *)interpret(p->opr.op[0])->value)

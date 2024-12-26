@@ -105,4 +105,25 @@ Variable *negateValue(Variable *val);
 void freeVars();
 void clearInputBuffer();
 
+typedef struct
+{
+    char name[32];
+    DataType returnType;
+    DataType paramTypes[10]; // Parameter types
+    char paramNames[10][32]; // Parameter names
+    int paramCount;
+    nodeType *body;
+} Function;
+
+typedef struct
+{
+    Function functions[100]; // Array to store functions
+    int count;
+} FunctionTable;
+
+extern FunctionTable functionTable;
+Function *findFunction(const char *name);
+void addFunction(const char *name, DataType returnType, nodeType *body);
+Variable *callFunction(const char *name, Variable **args, int argCount);
+
 #endif

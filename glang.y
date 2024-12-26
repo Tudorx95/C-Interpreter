@@ -38,8 +38,15 @@ void yyerror(const char *s);
 %left EQUAL NOTEQUAL LESSEQUAL GREATEREQUAL LESS GREATER
 
 %nonassoc UMINUS
+%nonassoc LPAREN 
+%nonassoc ASSIGN
+%nonassoc SEMICOLON
 %type <node> stmt expr stmt_list if_statement while_statement
 %type <node> declaration assignment print_statement scan_statement block_stmt
+
+%token FUNCTION
+%type <node> function_declaration function_call parameter_list expr_list block_stmt_func
+%type <iVal> type
 
 %start program
 
@@ -52,6 +59,29 @@ function: function stmt
         { interpret($2); freeNode($2);  }
         | /* NULL */
         ;
+
+function_call:
+    VAR LPAREN expr_list RPAREN
+    {
+        $$ = nodOper(FUNCTION, 2, nodId($1, OTHER_TYPE), $3);
+    }
+    ;
+
+expr_list:
+    expr
+    {
+        $$ = $1;
+    }
+    | expr_list COMMA expr
+    {
+        $$ = nodOper(COMMA, 2, $1, $3);
+    }
+    ;
+type:
+    INT     { $$ = INT_TYPE; }
+    | FLOAT { $$ = FLOAT_TYPE; }
+    | DOUBLE { $$ = DOUBLE_TYPE; }
+    ;
 
 stmt: SEMICOLON 
     { $$ = nodOper(SEMICOLON, 2, NULL, NULL); }
@@ -102,38 +132,91 @@ print_statement: PRINT expr SEMICOLON
 assignment: VAR ASSIGN expr SEMICOLON
     { $$ = nodOper(ASSIGN, 2, nodId($1,OTHER_TYPE), $3); }
     ;
-declaration: INT VAR ASSIGN expr SEMICOLON 
+declaration: INT VAR ASSIGN expr SEMICOLON %prec ASSIGN
     { 
         $$ = nodOper(ASSIGN, 2, nodId($2,INT_TYPE), $4);
     }
-    | FLOAT VAR ASSIGN expr SEMICOLON 
+    | FLOAT VAR ASSIGN expr SEMICOLON %prec ASSIGN
     {      
             $$ = nodOper(ASSIGN, 2, nodId($2,FLOAT_TYPE), $4);
     }
-    | DOUBLE VAR ASSIGN expr SEMICOLON
+    | DOUBLE VAR ASSIGN expr SEMICOLON %prec ASSIGN
     {
          $$ = nodOper(ASSIGN, 2, nodId($2,DOUBLE_TYPE), $4);
     }
-    | INT VAR SEMICOLON 
+    | INT VAR SEMICOLON %prec SEMICOLON
     {
         void*val=malloc(sizeof(int));
         *(int*)val=0;
         $$ = nodOper(ASSIGN, 2, nodId($2,INT_TYPE),nodCon(&val,INT_TYPE)); 
     }
-    | FLOAT VAR SEMICOLON 
+    | FLOAT VAR SEMICOLON %prec SEMICOLON
     {
        void*val=malloc(sizeof(float));
         *(float*)val=0;
         $$ = nodOper(ASSIGN, 2, nodId($2,FLOAT_TYPE),nodCon(&val,FLOAT_TYPE)); 
     }
-    | DOUBLE VAR SEMICOLON 
+    | DOUBLE VAR SEMICOLON %prec SEMICOLON
     {
        void*val=malloc(sizeof(double));
         *(double*)val=0;
         $$ = nodOper(ASSIGN, 2, nodId($2,DOUBLE_TYPE),nodCon(&val, DOUBLE_TYPE)); 
     }
-    ; 
-
+    | function_declaration
+    ;
+function_declaration: INT VAR LPAREN parameter_list RPAREN block_stmt_func
+    {
+        addFunction($2, INT_TYPE, $6);
+        $$ = NULL;  // Function declarations don't produce a value
+    }
+    | FLOAT VAR LPAREN parameter_list RPAREN block_stmt_func
+    {
+        addFunction($2, FLOAT_TYPE, $6);
+        $$ = NULL; 
+    }
+    | DOUBLE VAR LPAREN parameter_list RPAREN block_stmt_func
+    {
+        addFunction($2, DOUBLE_TYPE, $6);
+        $$ = NULL;
+    }
+    | INT VAR LPAREN RPAREN block_stmt_func
+    {
+        addFunction($2, INT_TYPE, $5);
+        $$ = NULL;
+    }
+    | FLOAT VAR LPAREN RPAREN block_stmt_func
+    {
+        addFunction($2, FLOAT_TYPE, $5);
+        $$ = NULL;
+    }
+    | DOUBLE VAR LPAREN RPAREN block_stmt_func
+    {
+        addFunction($2, DOUBLE_TYPE, $5);
+        $$ = NULL;
+    }
+    ;
+block_stmt_func: LBRACE RETURN expr SEMICOLON RBRACE 
+    { $$ = $3; }
+    ;
+parameter_list:
+    type VAR
+    {
+        // Store parameter information in current function
+        Function* func = &functionTable.functions[functionTable.count];
+        func->paramTypes[func->paramCount] = $1;
+        strncpy(func->paramNames[func->paramCount], $2, sizeof(func->paramNames[0]) - 1);
+        func->paramCount++;
+        $$ = nodId($2, $1);
+    }
+    | parameter_list COMMA type VAR
+    {
+        Function* func = &functionTable.functions[functionTable.count];
+        func->paramTypes[func->paramCount] = $3;
+        strncpy(func->paramNames[func->paramCount], $4, sizeof(func->paramNames[0]) - 1);
+        func->paramCount++;
+        $$ = nodOper(COMMA, 2, $1, nodId($4, $3));
+    }
+    ;
 
 while_statement: WHILE LPAREN expr RPAREN stmt
     { $$ = nodOper(WHILE, 2, $3, $5); }
@@ -145,7 +228,8 @@ if_statement: IF LPAREN expr RPAREN stmt %prec IFX
     { $$ = nodOper(IF, 3, $3, $5, $7); }
     ;
 
-expr: INT_VAL
+expr: function_call { $$ = $1; }
+    | INT_VAL
     {   
         $$ = nodCon(&$1,INT_TYPE); 
     }
