@@ -793,18 +793,18 @@ YY_RULE_SETUP
 case 2:
 YY_RULE_SETUP
 #line 18 "glang.l"
-{ BEGIN(COMMENT); }
+{ BEGIN(COMMENT); } // move to COMMENT state
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
 #line 19 "glang.l"
-{ BEGIN(INITIAL); }
+{ BEGIN(INITIAL); } // when the comment is closed, move to initial state
 	YY_BREAK
 case 4:
 /* rule 4 can match eol */
 YY_RULE_SETUP
 #line 20 "glang.l"
-;
+; // everything in this state is ignored
 	YY_BREAK
 case 5:
 YY_RULE_SETUP

@@ -727,6 +727,7 @@ Variable *interpret(nodeType *p)
           printf("Error: Invalid input for integer variable.\n");
           return NULL;
         }
+        printf("INTPUT: %d\n", input);
         *(int *)(val->value) = input; // Store the input value in the variable's allocated memory
         break;
       }
@@ -756,6 +757,9 @@ Variable *interpret(nodeType *p)
         printf("Error: Unsupported variable type for scan.\n");
         return NULL;
       }
+      printf("VAR NAME: %s, VAR TYPE: %d\n", p->opr.op[0]->id.name, val->type);
+      setVariableValue((const char *)p->opr.op[0]->id.name, val->type, val); // Assign value to variable
+
       clearInputBuffer();
       return val;
     }

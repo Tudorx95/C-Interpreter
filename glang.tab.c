@@ -73,6 +73,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <setjmp.h>
 #include "glang.h"
 
 extern FILE *yyin;
@@ -80,9 +81,15 @@ extern int yylex();
 extern void yyrestart(FILE *input_file);
 
 void yyerror(const char *s);
+volatile sig_atomic_t canJump = 0;
+
+/* Set to 1 once "env" buffer has been
+   initialized by [sig]setjmp() */
+  static jmp_buf env;
 
 
-#line 86 "glang.tab.c"
+
+#line 93 "glang.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -556,13 +563,13 @@ static const yytype_int8 yytranslate[] =
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_int16 yyrline[] =
 {
-       0,    53,    53,    57,    59,    63,    70,    74,    80,    81,
-      82,    85,    87,    89,    91,    93,    95,    97,    99,   101,
-     106,   105,   119,   121,   124,   127,   131,   134,   138,   142,
-     146,   152,   158,   164,   166,   171,   176,   181,   186,   191,
-     197,   201,   210,   220,   224,   226,   230,   231,   235,   239,
-     243,   245,   247,   249,   251,   253,   262,   264,   266,   268,
-     270,   272,   274,   278,   282,   286
+       0,    60,    60,    64,    66,    70,    77,    81,    87,    88,
+      89,    92,    94,    96,    98,   100,   102,   104,   106,   108,
+     113,   112,   126,   128,   131,   134,   138,   141,   145,   149,
+     153,   159,   165,   171,   173,   178,   183,   188,   193,   198,
+     204,   208,   217,   227,   231,   233,   237,   238,   242,   246,
+     250,   252,   254,   256,   258,   260,   269,   271,   273,   275,
+     277,   279,   281,   285,   289,   293
 };
 #endif
 
@@ -1514,276 +1521,276 @@ yyreduce:
   switch (yyn)
     {
   case 2: /* program: function  */
-#line 54 "glang.y"
+#line 61 "glang.y"
         { freeVars(); }
-#line 1520 "glang.tab.c"
+#line 1527 "glang.tab.c"
     break;
 
   case 3: /* function: function stmt  */
-#line 58 "glang.y"
+#line 65 "glang.y"
         { interpret((yyvsp[0].node)); freeNode((yyvsp[0].node));  }
-#line 1526 "glang.tab.c"
+#line 1533 "glang.tab.c"
     break;
 
   case 5: /* function_call: VAR LPAREN expr_list RPAREN  */
-#line 64 "glang.y"
+#line 71 "glang.y"
     {
         (yyval.node) = nodOper(FUNCTION, 2, nodId((yyvsp[-3].sval), OTHER_TYPE), (yyvsp[-1].node));
     }
-#line 1534 "glang.tab.c"
+#line 1541 "glang.tab.c"
     break;
 
   case 6: /* expr_list: expr  */
-#line 71 "glang.y"
+#line 78 "glang.y"
     {
         (yyval.node) = (yyvsp[0].node);
     }
-#line 1542 "glang.tab.c"
+#line 1549 "glang.tab.c"
     break;
 
   case 7: /* expr_list: expr_list COMMA expr  */
-#line 75 "glang.y"
+#line 82 "glang.y"
     {
         (yyval.node) = nodOper(COMMA, 2, (yyvsp[-2].node), (yyvsp[0].node));
     }
-#line 1550 "glang.tab.c"
+#line 1557 "glang.tab.c"
     break;
 
   case 8: /* type: INT  */
-#line 80 "glang.y"
+#line 87 "glang.y"
             { (yyval.iVal) = INT_TYPE; }
-#line 1556 "glang.tab.c"
+#line 1563 "glang.tab.c"
     break;
 
   case 9: /* type: FLOAT  */
-#line 81 "glang.y"
+#line 88 "glang.y"
             { (yyval.iVal) = FLOAT_TYPE; }
-#line 1562 "glang.tab.c"
+#line 1569 "glang.tab.c"
     break;
 
   case 10: /* type: DOUBLE  */
-#line 82 "glang.y"
+#line 89 "glang.y"
              { (yyval.iVal) = DOUBLE_TYPE; }
-#line 1568 "glang.tab.c"
+#line 1575 "glang.tab.c"
     break;
 
   case 11: /* stmt: SEMICOLON  */
-#line 86 "glang.y"
+#line 93 "glang.y"
     { (yyval.node) = nodOper(SEMICOLON, 2, NULL, NULL); }
-#line 1574 "glang.tab.c"
+#line 1581 "glang.tab.c"
     break;
 
   case 12: /* stmt: expr SEMICOLON  */
-#line 88 "glang.y"
+#line 95 "glang.y"
     { (yyval.node) = (yyvsp[-1].node); }
-#line 1580 "glang.tab.c"
+#line 1587 "glang.tab.c"
     break;
 
   case 13: /* stmt: print_statement  */
-#line 90 "glang.y"
+#line 97 "glang.y"
     { (yyval.node) = (yyvsp[0].node); }
-#line 1586 "glang.tab.c"
+#line 1593 "glang.tab.c"
     break;
 
   case 14: /* stmt: scan_statement  */
-#line 92 "glang.y"
+#line 99 "glang.y"
     { (yyval.node) = (yyvsp[0].node); }
-#line 1592 "glang.tab.c"
+#line 1599 "glang.tab.c"
     break;
 
   case 15: /* stmt: declaration  */
-#line 94 "glang.y"
+#line 101 "glang.y"
     { (yyval.node) = (yyvsp[0].node); }
-#line 1598 "glang.tab.c"
+#line 1605 "glang.tab.c"
     break;
 
   case 16: /* stmt: assignment  */
-#line 96 "glang.y"
+#line 103 "glang.y"
     { (yyval.node) = (yyvsp[0].node); }
-#line 1604 "glang.tab.c"
+#line 1611 "glang.tab.c"
     break;
 
   case 17: /* stmt: while_statement  */
-#line 98 "glang.y"
+#line 105 "glang.y"
     { (yyval.node) = (yyvsp[0].node); }
-#line 1610 "glang.tab.c"
+#line 1617 "glang.tab.c"
     break;
 
   case 18: /* stmt: if_statement  */
-#line 100 "glang.y"
+#line 107 "glang.y"
     { (yyval.node) = (yyvsp[0].node); }
-#line 1616 "glang.tab.c"
+#line 1623 "glang.tab.c"
     break;
 
   case 19: /* stmt: block_stmt  */
-#line 102 "glang.y"
+#line 109 "glang.y"
     { (yyval.node) = (yyvsp[0].node); }
-#line 1622 "glang.tab.c"
+#line 1629 "glang.tab.c"
     break;
 
   case 20: /* $@1: %empty  */
-#line 106 "glang.y"
+#line 113 "glang.y"
     { 
         enterScope();
     }
-#line 1630 "glang.tab.c"
+#line 1637 "glang.tab.c"
     break;
 
   case 21: /* block_stmt: LBRACE $@1 stmt_list RBRACE  */
-#line 113 "glang.y"
+#line 120 "glang.y"
     {
        exitScope(); 
         (yyval.node) = (yyvsp[-1].node);
     }
-#line 1639 "glang.tab.c"
+#line 1646 "glang.tab.c"
     break;
 
   case 22: /* stmt_list: stmt  */
-#line 120 "glang.y"
+#line 127 "glang.y"
         { (yyval.node) = (yyvsp[0].node); }
-#line 1645 "glang.tab.c"
+#line 1652 "glang.tab.c"
     break;
 
   case 23: /* stmt_list: stmt_list stmt  */
-#line 122 "glang.y"
+#line 129 "glang.y"
         { (yyval.node) = nodOper(SEMICOLON, 2, (yyvsp[-1].node), (yyvsp[0].node)); }
-#line 1651 "glang.tab.c"
+#line 1658 "glang.tab.c"
     break;
 
   case 24: /* scan_statement: SCAN expr SEMICOLON  */
-#line 125 "glang.y"
+#line 132 "glang.y"
         { (yyval.node) = nodOper(SCAN, 1, (yyvsp[-1].node)); }
-#line 1657 "glang.tab.c"
+#line 1664 "glang.tab.c"
     break;
 
   case 25: /* print_statement: PRINT expr SEMICOLON  */
-#line 128 "glang.y"
+#line 135 "glang.y"
     { (yyval.node) = nodOper(PRINT, 1, (yyvsp[-1].node)); }
-#line 1663 "glang.tab.c"
+#line 1670 "glang.tab.c"
     break;
 
   case 26: /* assignment: VAR ASSIGN expr SEMICOLON  */
-#line 132 "glang.y"
+#line 139 "glang.y"
     { (yyval.node) = nodOper(ASSIGN, 2, nodId((yyvsp[-3].sval),OTHER_TYPE), (yyvsp[-1].node)); }
-#line 1669 "glang.tab.c"
+#line 1676 "glang.tab.c"
     break;
 
   case 27: /* declaration: INT VAR ASSIGN expr SEMICOLON  */
-#line 135 "glang.y"
+#line 142 "glang.y"
     { 
         (yyval.node) = nodOper(ASSIGN, 2, nodId((yyvsp[-3].sval),INT_TYPE), (yyvsp[-1].node));
     }
-#line 1677 "glang.tab.c"
+#line 1684 "glang.tab.c"
     break;
 
   case 28: /* declaration: FLOAT VAR ASSIGN expr SEMICOLON  */
-#line 139 "glang.y"
+#line 146 "glang.y"
     {      
             (yyval.node) = nodOper(ASSIGN, 2, nodId((yyvsp[-3].sval),FLOAT_TYPE), (yyvsp[-1].node));
     }
-#line 1685 "glang.tab.c"
+#line 1692 "glang.tab.c"
     break;
 
   case 29: /* declaration: DOUBLE VAR ASSIGN expr SEMICOLON  */
-#line 143 "glang.y"
+#line 150 "glang.y"
     {
          (yyval.node) = nodOper(ASSIGN, 2, nodId((yyvsp[-3].sval),DOUBLE_TYPE), (yyvsp[-1].node));
     }
-#line 1693 "glang.tab.c"
+#line 1700 "glang.tab.c"
     break;
 
   case 30: /* declaration: INT VAR SEMICOLON  */
-#line 147 "glang.y"
+#line 154 "glang.y"
     {
         void*val=malloc(sizeof(int));
         *(int*)val=0;
         (yyval.node) = nodOper(ASSIGN, 2, nodId((yyvsp[-1].sval),INT_TYPE),nodCon(&val,INT_TYPE)); 
     }
-#line 1703 "glang.tab.c"
+#line 1710 "glang.tab.c"
     break;
 
   case 31: /* declaration: FLOAT VAR SEMICOLON  */
-#line 153 "glang.y"
+#line 160 "glang.y"
     {
        void*val=malloc(sizeof(float));
         *(float*)val=0;
         (yyval.node) = nodOper(ASSIGN, 2, nodId((yyvsp[-1].sval),FLOAT_TYPE),nodCon(&val,FLOAT_TYPE)); 
     }
-#line 1713 "glang.tab.c"
+#line 1720 "glang.tab.c"
     break;
 
   case 32: /* declaration: DOUBLE VAR SEMICOLON  */
-#line 159 "glang.y"
+#line 166 "glang.y"
     {
        void*val=malloc(sizeof(double));
         *(double*)val=0;
         (yyval.node) = nodOper(ASSIGN, 2, nodId((yyvsp[-1].sval),DOUBLE_TYPE),nodCon(&val, DOUBLE_TYPE)); 
     }
-#line 1723 "glang.tab.c"
+#line 1730 "glang.tab.c"
     break;
 
   case 34: /* function_declaration: INT VAR LPAREN parameter_list RPAREN block_stmt_func  */
-#line 167 "glang.y"
+#line 174 "glang.y"
     {
         addFunction((yyvsp[-4].sval), INT_TYPE, (yyvsp[0].node));
         (yyval.node) = NULL;  // Function declarations don't produce a value
     }
-#line 1732 "glang.tab.c"
+#line 1739 "glang.tab.c"
     break;
 
   case 35: /* function_declaration: FLOAT VAR LPAREN parameter_list RPAREN block_stmt_func  */
-#line 172 "glang.y"
+#line 179 "glang.y"
     {
         addFunction((yyvsp[-4].sval), FLOAT_TYPE, (yyvsp[0].node));
         (yyval.node) = NULL; 
     }
-#line 1741 "glang.tab.c"
+#line 1748 "glang.tab.c"
     break;
 
   case 36: /* function_declaration: DOUBLE VAR LPAREN parameter_list RPAREN block_stmt_func  */
-#line 177 "glang.y"
+#line 184 "glang.y"
     {
         addFunction((yyvsp[-4].sval), DOUBLE_TYPE, (yyvsp[0].node));
         (yyval.node) = NULL;
     }
-#line 1750 "glang.tab.c"
+#line 1757 "glang.tab.c"
     break;
 
   case 37: /* function_declaration: INT VAR LPAREN RPAREN block_stmt_func  */
-#line 182 "glang.y"
+#line 189 "glang.y"
     {
         addFunction((yyvsp[-3].sval), INT_TYPE, (yyvsp[0].node));
         (yyval.node) = NULL;
     }
-#line 1759 "glang.tab.c"
+#line 1766 "glang.tab.c"
     break;
 
   case 38: /* function_declaration: FLOAT VAR LPAREN RPAREN block_stmt_func  */
-#line 187 "glang.y"
+#line 194 "glang.y"
     {
         addFunction((yyvsp[-3].sval), FLOAT_TYPE, (yyvsp[0].node));
         (yyval.node) = NULL;
     }
-#line 1768 "glang.tab.c"
+#line 1775 "glang.tab.c"
     break;
 
   case 39: /* function_declaration: DOUBLE VAR LPAREN RPAREN block_stmt_func  */
-#line 192 "glang.y"
+#line 199 "glang.y"
     {
         addFunction((yyvsp[-3].sval), DOUBLE_TYPE, (yyvsp[0].node));
         (yyval.node) = NULL;
     }
-#line 1777 "glang.tab.c"
+#line 1784 "glang.tab.c"
     break;
 
   case 40: /* block_stmt_func: LBRACE RETURN expr SEMICOLON RBRACE  */
-#line 198 "glang.y"
+#line 205 "glang.y"
     { (yyval.node) = (yyvsp[-2].node); }
-#line 1783 "glang.tab.c"
+#line 1790 "glang.tab.c"
     break;
 
   case 41: /* parameter_list: type VAR  */
-#line 202 "glang.y"
+#line 209 "glang.y"
     {
         // Store parameter information in current function
         Function* func = &functionTable.functions[functionTable.count];
@@ -1792,11 +1799,11 @@ yyreduce:
         func->paramCount++;
         (yyval.node) = nodId((yyvsp[0].sval), (yyvsp[-1].iVal));
     }
-#line 1796 "glang.tab.c"
+#line 1803 "glang.tab.c"
     break;
 
   case 42: /* parameter_list: parameter_list COMMA type VAR  */
-#line 211 "glang.y"
+#line 218 "glang.y"
     {
         Function* func = &functionTable.functions[functionTable.count];
         func->paramTypes[func->paramCount] = (yyvsp[-1].iVal);
@@ -1804,89 +1811,89 @@ yyreduce:
         func->paramCount++;
         (yyval.node) = nodOper(COMMA, 2, (yyvsp[-3].node), nodId((yyvsp[0].sval), (yyvsp[-1].iVal)));
     }
-#line 1808 "glang.tab.c"
+#line 1815 "glang.tab.c"
     break;
 
   case 43: /* while_statement: WHILE LPAREN expr RPAREN stmt  */
-#line 221 "glang.y"
+#line 228 "glang.y"
     { (yyval.node) = nodOper(WHILE, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1814 "glang.tab.c"
+#line 1821 "glang.tab.c"
     break;
 
   case 44: /* if_statement: IF LPAREN expr RPAREN stmt  */
-#line 225 "glang.y"
+#line 232 "glang.y"
     { (yyval.node) = nodOper(IF, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1820 "glang.tab.c"
+#line 1827 "glang.tab.c"
     break;
 
   case 45: /* if_statement: IF LPAREN expr RPAREN stmt ELSE stmt  */
-#line 227 "glang.y"
+#line 234 "glang.y"
     { (yyval.node) = nodOper(IF, 3, (yyvsp[-4].node), (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1826 "glang.tab.c"
+#line 1833 "glang.tab.c"
     break;
 
   case 46: /* expr: function_call  */
-#line 230 "glang.y"
+#line 237 "glang.y"
                     { (yyval.node) = (yyvsp[0].node); }
-#line 1832 "glang.tab.c"
+#line 1839 "glang.tab.c"
     break;
 
   case 47: /* expr: INT_VAL  */
-#line 232 "glang.y"
+#line 239 "glang.y"
     {   
         (yyval.node) = nodCon(&(yyvsp[0].iVal),INT_TYPE); 
     }
-#line 1840 "glang.tab.c"
+#line 1847 "glang.tab.c"
     break;
 
   case 48: /* expr: FLOAT_VAL  */
-#line 236 "glang.y"
+#line 243 "glang.y"
     { 
         (yyval.node) = nodCon(&(yyvsp[0].fVal),FLOAT_TYPE); 
     }
-#line 1848 "glang.tab.c"
+#line 1855 "glang.tab.c"
     break;
 
   case 49: /* expr: DOUBLE_VAL  */
-#line 240 "glang.y"
+#line 247 "glang.y"
     { 
         (yyval.node) = nodCon(&(yyvsp[0].dVal),DOUBLE_TYPE); 
     }
-#line 1856 "glang.tab.c"
+#line 1863 "glang.tab.c"
     break;
 
   case 50: /* expr: VAR  */
-#line 244 "glang.y"
+#line 251 "glang.y"
     { (yyval.node) = nodId((yyvsp[0].sval),OTHER_TYPE); }
-#line 1862 "glang.tab.c"
+#line 1869 "glang.tab.c"
     break;
 
   case 51: /* expr: MINUS expr  */
-#line 246 "glang.y"
+#line 253 "glang.y"
     { (yyval.node) = nodOper(UMINUS, 1, (yyvsp[0].node)); }
-#line 1868 "glang.tab.c"
+#line 1875 "glang.tab.c"
     break;
 
   case 52: /* expr: expr PLUS expr  */
-#line 248 "glang.y"
+#line 255 "glang.y"
     { (yyval.node) = nodOper(PLUS, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1874 "glang.tab.c"
+#line 1881 "glang.tab.c"
     break;
 
   case 53: /* expr: expr MINUS expr  */
-#line 250 "glang.y"
+#line 257 "glang.y"
     { (yyval.node) = nodOper(MINUS, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1880 "glang.tab.c"
+#line 1887 "glang.tab.c"
     break;
 
   case 54: /* expr: expr MULTIPLY expr  */
-#line 252 "glang.y"
+#line 259 "glang.y"
     { (yyval.node) = nodOper(MULTIPLY, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1886 "glang.tab.c"
+#line 1893 "glang.tab.c"
     break;
 
   case 55: /* expr: expr DIVIDE expr  */
-#line 254 "glang.y"
+#line 261 "glang.y"
     {
         if ((yyvsp[0].node)->con.iVal == 0) 
         {
@@ -1895,77 +1902,77 @@ yyreduce:
         }
         (yyval.node) = nodOper(DIVIDE, 2, (yyvsp[-2].node), (yyvsp[0].node)); 
     }
-#line 1899 "glang.tab.c"
+#line 1906 "glang.tab.c"
     break;
 
   case 56: /* expr: expr LESS expr  */
-#line 263 "glang.y"
+#line 270 "glang.y"
     { (yyval.node) = nodOper(LESS, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1905 "glang.tab.c"
+#line 1912 "glang.tab.c"
     break;
 
   case 57: /* expr: expr GREATER expr  */
-#line 265 "glang.y"
+#line 272 "glang.y"
     { (yyval.node) = nodOper(GREATER, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1911 "glang.tab.c"
+#line 1918 "glang.tab.c"
     break;
 
   case 58: /* expr: expr GREATEREQUAL expr  */
-#line 267 "glang.y"
+#line 274 "glang.y"
     { (yyval.node) = nodOper(GREATEREQUAL, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1917 "glang.tab.c"
+#line 1924 "glang.tab.c"
     break;
 
   case 59: /* expr: expr LESSEQUAL expr  */
-#line 269 "glang.y"
+#line 276 "glang.y"
     { (yyval.node) = nodOper(LESSEQUAL, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1923 "glang.tab.c"
+#line 1930 "glang.tab.c"
     break;
 
   case 60: /* expr: expr NOTEQUAL expr  */
-#line 271 "glang.y"
+#line 278 "glang.y"
     { (yyval.node) = nodOper(NOTEQUAL, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1929 "glang.tab.c"
+#line 1936 "glang.tab.c"
     break;
 
   case 61: /* expr: expr EQUAL expr  */
-#line 273 "glang.y"
+#line 280 "glang.y"
     { (yyval.node) = nodOper(EQUAL, 2, (yyvsp[-2].node), (yyvsp[0].node)); }
-#line 1935 "glang.tab.c"
+#line 1942 "glang.tab.c"
     break;
 
   case 62: /* expr: LPAREN INT RPAREN expr  */
-#line 275 "glang.y"
+#line 282 "glang.y"
     {
         (yyval.node) = (yyvsp[0].node);
     }
-#line 1943 "glang.tab.c"
+#line 1950 "glang.tab.c"
     break;
 
   case 63: /* expr: LPAREN FLOAT RPAREN expr  */
-#line 279 "glang.y"
+#line 286 "glang.y"
     {
         (yyval.node) = (yyvsp[0].node);
     }
-#line 1951 "glang.tab.c"
+#line 1958 "glang.tab.c"
     break;
 
   case 64: /* expr: LPAREN DOUBLE RPAREN expr  */
-#line 283 "glang.y"
+#line 290 "glang.y"
     {
         (yyval.node) = (yyvsp[0].node);
     }
-#line 1959 "glang.tab.c"
+#line 1966 "glang.tab.c"
     break;
 
   case 65: /* expr: LPAREN expr RPAREN  */
-#line 287 "glang.y"
+#line 294 "glang.y"
     { (yyval.node) = (yyvsp[-1].node); }
-#line 1965 "glang.tab.c"
+#line 1972 "glang.tab.c"
     break;
 
 
-#line 1969 "glang.tab.c"
+#line 1976 "glang.tab.c"
 
       default: break;
     }
@@ -2189,7 +2196,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 289 "glang.y"
+#line 296 "glang.y"
 
 
 void yyerror(const char *s) {
@@ -2199,6 +2206,8 @@ void yyerror(const char *s) {
 void signal_handler(int signo)
 {
     printf("Signal %d caught!\n", signo);
+    longjmp(env, 1);
+    
     exit(0);
 }
 
@@ -2222,10 +2231,27 @@ int main(int argc, char *argv[]) {
     printf("Welcome to the C PARSER\n\n");
     for(int i=0; i<30; i++,printf("="));
     printf("\n");
+
+    // Set up the initial jump point
+    if (sigsetjmp(env, 1) != 0) 
+    {
+        // We've jumped back here after a signal
+        printf("\nReturned to main loop after signal.\n");
+        clearInputBuffer();
+        fflush(stdout);
+    }
+
     while(1)
     {
+        // Activate the jump mechanism
+        canJump = 1;
+
         printf("Enter to start (or analyze a program: run <script_name> or <exit> to shutdown the program): ");
         fgets(input, sizeof(input), stdin);
+
+         // Deactivate the jump mechanism during processing
+        canJump = 0;
+
         if(strcmp(input, "exit\n") == 0)
             break;
         printf("Start analyzing the context!\n");

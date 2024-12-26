@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <signal.h>
+#include <setjmp.h>
 #include "glang.h"
 
 extern FILE *yyin;
@@ -10,6 +11,12 @@ extern int yylex();
 extern void yyrestart(FILE *input_file);
 
 void yyerror(const char *s);
+volatile sig_atomic_t canJump = 0;
+
+/* Set to 1 once "env" buffer has been
+   initialized by [sig]setjmp() */
+  static jmp_buf env;
+
 
 %}
 
@@ -295,6 +302,8 @@ void yyerror(const char *s) {
 void signal_handler(int signo)
 {
     printf("Signal %d caught!\n", signo);
+    longjmp(env, 1);
+    
     exit(0);
 }
 
@@ -318,10 +327,27 @@ int main(int argc, char *argv[]) {
     printf("Welcome to the C PARSER\n\n");
     for(int i=0; i<30; i++,printf("="));
     printf("\n");
+
+    // Set up the initial jump point
+    if (sigsetjmp(env, 1) != 0) 
+    {
+        // We've jumped back here after a signal
+        printf("\nReturned to main loop after signal.\n");
+        clearInputBuffer();
+        fflush(stdout);
+    }
+
     while(1)
     {
+        // Activate the jump mechanism
+        canJump = 1;
+
         printf("Enter to start (or analyze a program: run <script_name> or <exit> to shutdown the program): ");
         fgets(input, sizeof(input), stdin);
+
+         // Deactivate the jump mechanism during processing
+        canJump = 0;
+
         if(strcmp(input, "exit\n") == 0)
             break;
         printf("Start analyzing the context!\n");
