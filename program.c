@@ -1,4 +1,4 @@
-int x = /*10;
+int x = 10;
 {
     int a;
     a = 5;
@@ -25,7 +25,7 @@ printf(a);
 double p = 10.2;
 float d = (float)p;
 printf(d);
-*/ 10;
+
 printf( // x);
     x);
 scanf(x);

@@ -67,21 +67,21 @@ void exitScope()
 {
   printf("EXITS SCOPE\n");
   // Șterge toate variabilele din scope-ul curent
-  // for (int i = symCount - 1; i >= 0; i--)
-  // {
-  //   if (sym[i].scope_level == current_scope)
-  //   {
-  //     free(sym[i].value);
-  //     free(sym[i].name);
+  for (int i = symCount - 1; i >= 0; i--)
+  {
+    if (sym[i].scope_level == current_scope)
+    {
+      free(sym[i].value);
+      free(sym[i].name);
 
-  //     // Mutăm ultima variabilă în locul celei șterse
-  //     if (i < symCount - 1)
-  //     {
-  //       sym[i] = sym[symCount - 1];
-  //     }
-  //     symCount--;
-  //   }
-  // }
+      // Mutăm ultima variabilă în locul celei șterse
+      if (i < symCount - 1)
+      {
+        sym[i] = sym[symCount - 1];
+      }
+      symCount--;
+    }
+  }
   current_scope--;
 }
 

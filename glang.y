@@ -299,6 +299,16 @@ void yyerror(const char *s) {
     fprintf(stderr, "Error: %s\n", s);
 }
 
+// Function to reset lexer and parser states
+void reset_parser_state() {
+    // Reset input streams
+    yyrestart(stdin);
+    yyin = stdin;
+    
+    // Clear any existing error flags
+    clearerr(stdin);
+}
+
 void signal_handler(int signo)
 {
     printf("Signal %d caught!\n", signo);
@@ -332,9 +342,11 @@ int main(int argc, char *argv[]) {
     if (sigsetjmp(env, 1) != 0) 
     {
         // We've jumped back here after a signal
-        printf("\nReturned to main loop after signal.\n");
+        printf("\nReturned to main loop after signal. Press Enter:\n");
+        reset_parser_state();
         clearInputBuffer();
         fflush(stdout);
+        fflush(stdin);
     }
 
     while(1)
