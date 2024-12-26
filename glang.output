@@ -1,8 +1,5 @@
 Terminals unused in grammar
 
-    SLINE_COMMENT
-    OPEN_MLINE_COMMENT
-    CLOSE_MLINE_COMMENT
     MODULO
     FUNCTION
 
@@ -111,92 +108,89 @@ Terminals, with rules where they appear
     PRINT (267) 24
     SCAN (268) 23
     RETURN (269) 39
-    SLINE_COMMENT (270)
-    OPEN_MLINE_COMMENT (271)
-    CLOSE_MLINE_COMMENT (272)
-    LPAREN (273) 4 33 34 35 36 37 38 42 43 44 61 62 63 64
-    RPAREN (274) 4 33 34 35 36 37 38 42 43 44 61 62 63 64
-    LBRACE (275) 20 39
-    RBRACE (276) 20 39
-    COMMA (277) 6 41
-    SEMICOLON (278) 10 11 23 24 25 26 27 28 29 30 31 39
-    ASSIGN (279) 25 26 27 28
-    MODULO (280)
-    IFX (281)
-    ELSE (282) 44
-    PLUS (283) 51
-    MINUS (284) 50 52
-    MULTIPLY (285) 53
-    DIVIDE (286) 54
-    EQUAL (287) 60
-    NOTEQUAL (288) 59
-    LESSEQUAL (289) 58
-    GREATEREQUAL (290) 57
-    LESS (291) 55
-    GREATER (292) 56
-    UMINUS (293)
-    FUNCTION (294)
+    LPAREN (270) 4 33 34 35 36 37 38 42 43 44 61 62 63 64
+    RPAREN (271) 4 33 34 35 36 37 38 42 43 44 61 62 63 64
+    LBRACE (272) 20 39
+    RBRACE (273) 20 39
+    COMMA (274) 6 41
+    SEMICOLON (275) 10 11 23 24 25 26 27 28 29 30 31 39
+    ASSIGN (276) 25 26 27 28
+    MODULO (277)
+    IFX (278)
+    ELSE (279) 44
+    PLUS (280) 51
+    MINUS (281) 50 52
+    MULTIPLY (282) 53
+    DIVIDE (283) 54
+    EQUAL (284) 60
+    NOTEQUAL (285) 59
+    LESSEQUAL (286) 58
+    GREATEREQUAL (287) 57
+    LESS (288) 55
+    GREATER (289) 56
+    UMINUS (290)
+    FUNCTION (291)
 
 
 Nonterminals, with rules where they appear
 
-    $accept (40)
+    $accept (37)
         on left: 0
-    program (41)
+    program (38)
         on left: 1
         on right: 0
-    function (42)
+    function (39)
         on left: 2 3
         on right: 1 2
-    function_call <node> (43)
+    function_call <node> (40)
         on left: 4
         on right: 45
-    expr_list <node> (44)
+    expr_list <node> (41)
         on left: 5 6
         on right: 4 6
-    type <iVal> (45)
+    type <iVal> (42)
         on left: 7 8 9
         on right: 40 41
-    stmt <node> (46)
+    stmt <node> (43)
         on left: 10 11 12 13 14 15 16 17 18
         on right: 2 21 22 42 43 44
-    block_stmt <node> (47)
+    block_stmt <node> (44)
         on left: 20
         on right: 18
-    $@1 (48)
+    $@1 (45)
         on left: 19
         on right: 20
-    stmt_list <node> (49)
+    stmt_list <node> (46)
         on left: 21 22
         on right: 20 22
-    scan_statement <node> (50)
+    scan_statement <node> (47)
         on left: 23
         on right: 13
-    print_statement <node> (51)
+    print_statement <node> (48)
         on left: 24
         on right: 12
-    assignment <node> (52)
+    assignment <node> (49)
         on left: 25
         on right: 15
-    declaration <node> (53)
+    declaration <node> (50)
         on left: 26 27 28 29 30 31 32
         on right: 14
-    function_declaration <node> (54)
+    function_declaration <node> (51)
         on left: 33 34 35 36 37 38
         on right: 32
-    block_stmt_func <node> (55)
+    block_stmt_func <node> (52)
         on left: 39
         on right: 33 34 35 36 37 38
-    parameter_list <node> (56)
+    parameter_list <node> (53)
         on left: 40 41
         on right: 33 34 35 41
-    while_statement <node> (57)
+    while_statement <node> (54)
         on left: 42
         on right: 16
-    if_statement <node> (58)
+    if_statement <node> (55)
         on left: 43 44
         on right: 17
-    expr <node> (59)
+    expr <node> (56)
         on left: 45 46 47 48 49 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
         on right: 5 6 11 23 24 25 26 27 28 39 42 43 44 50 51 52 53 54 55 56 57 58 59 60 61 62 63 64
 

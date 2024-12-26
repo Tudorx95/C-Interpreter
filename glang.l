@@ -10,8 +10,15 @@ void yyerror(const char *s);
 
 %}
 
+%x COMMENT
 
 %%
+"//".*          ; /* Ignore single-line comments */
+
+"/*"            { BEGIN(COMMENT); } // move to COMMENT state
+<COMMENT>"*/"   { BEGIN(INITIAL); } // when the comment is closed, move to initial state
+<COMMENT>.|\n   ; // everything in this state is ignored
+
 "int"           { return INT; }
 "float"         { return FLOAT; }
 "double"        { return DOUBLE; }
@@ -21,9 +28,8 @@ void yyerror(const char *s);
 "if"            { return IF; }
 "else"          { return ELSE; }
 "while"         { return WHILE; }
-"//".*          { return SLINE_COMMENT;}  
-"/*"            { return OPEN_MLINE_COMMENT; }
-"*/"            { return CLOSE_MLINE_COMMENT; }
+
+
 [a-zA-Z_][a-zA-Z0-9_]*   { yylval.sval = strdup(yytext); return VAR; }
 [0-9]+\.[0-9]+           { 
                               char *endptr;

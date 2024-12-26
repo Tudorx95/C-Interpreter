@@ -66,31 +66,28 @@ extern int yydebug;
     PRINT = 267,                   /* PRINT  */
     SCAN = 268,                    /* SCAN  */
     RETURN = 269,                  /* RETURN  */
-    SLINE_COMMENT = 270,           /* SLINE_COMMENT  */
-    OPEN_MLINE_COMMENT = 271,      /* OPEN_MLINE_COMMENT  */
-    CLOSE_MLINE_COMMENT = 272,     /* CLOSE_MLINE_COMMENT  */
-    LPAREN = 273,                  /* LPAREN  */
-    RPAREN = 274,                  /* RPAREN  */
-    LBRACE = 275,                  /* LBRACE  */
-    RBRACE = 276,                  /* RBRACE  */
-    COMMA = 277,                   /* COMMA  */
-    SEMICOLON = 278,               /* SEMICOLON  */
-    ASSIGN = 279,                  /* ASSIGN  */
-    MODULO = 280,                  /* MODULO  */
-    IFX = 281,                     /* IFX  */
-    ELSE = 282,                    /* ELSE  */
-    PLUS = 283,                    /* PLUS  */
-    MINUS = 284,                   /* MINUS  */
-    MULTIPLY = 285,                /* MULTIPLY  */
-    DIVIDE = 286,                  /* DIVIDE  */
-    EQUAL = 287,                   /* EQUAL  */
-    NOTEQUAL = 288,                /* NOTEQUAL  */
-    LESSEQUAL = 289,               /* LESSEQUAL  */
-    GREATEREQUAL = 290,            /* GREATEREQUAL  */
-    LESS = 291,                    /* LESS  */
-    GREATER = 292,                 /* GREATER  */
-    UMINUS = 293,                  /* UMINUS  */
-    FUNCTION = 294                 /* FUNCTION  */
+    LPAREN = 270,                  /* LPAREN  */
+    RPAREN = 271,                  /* RPAREN  */
+    LBRACE = 272,                  /* LBRACE  */
+    RBRACE = 273,                  /* RBRACE  */
+    COMMA = 274,                   /* COMMA  */
+    SEMICOLON = 275,               /* SEMICOLON  */
+    ASSIGN = 276,                  /* ASSIGN  */
+    MODULO = 277,                  /* MODULO  */
+    IFX = 278,                     /* IFX  */
+    ELSE = 279,                    /* ELSE  */
+    PLUS = 280,                    /* PLUS  */
+    MINUS = 281,                   /* MINUS  */
+    MULTIPLY = 282,                /* MULTIPLY  */
+    DIVIDE = 283,                  /* DIVIDE  */
+    EQUAL = 284,                   /* EQUAL  */
+    NOTEQUAL = 285,                /* NOTEQUAL  */
+    LESSEQUAL = 286,               /* LESSEQUAL  */
+    GREATEREQUAL = 287,            /* GREATEREQUAL  */
+    LESS = 288,                    /* LESS  */
+    GREATER = 289,                 /* GREATER  */
+    UMINUS = 290,                  /* UMINUS  */
+    FUNCTION = 291                 /* FUNCTION  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -107,7 +104,7 @@ union YYSTYPE
     char *sval;
     nodeType *node;
 
-#line 111 "glang.tab.h"
+#line 108 "glang.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
