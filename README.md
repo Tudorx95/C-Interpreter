@@ -5,10 +5,10 @@ An example of C interpreter language using FLEX and BISON.
 ## Table of Contents
 
 - [What is an interpretor?](#project_overview)
-- [Interpretors vs Compilers](#interpretors-compilers)
-- [C-Interpreter Functionalities](#server_app)
-- [Terminal Experience](#gui_app)
-- [Usage](#run_app)
+- [Interpretors vs Compilers](#Interpretors-vs-Compilers)
+- [C-Interpreter Functionalities](#C-Interpreter-Functionalities)
+- [Terminal Experience](#Terminal-Experience)
+- [Usage](#usage)
 - [Bibliography](#bibliography)
 - [Contributors](#contributors)
 
@@ -93,7 +93,7 @@ analyze its appropriate C program.
 
 After the command "run <program_name>" the user must press enter to return to the menu.
 After the pressing enter, the user can return to the menu by pressing CTRL-C command (SIGINT signal that is handled) and then press enter.
-The program can be stopped ###only### with "exit" command.
+The program can be stopped only with "exit" command.
 
 ## Usage
 
@@ -102,4 +102,10 @@ Then navigate inside the project folder (cd C-Interpreter).
 From that just run make -B interpreter to start the compilation process of the Interpreter.
 And then run the interpreter using: ./glang
 
+## Bibliography
+
+- Gheorghe Grigoras, "Proiectarea Compilatoarelor", University of "Alexandru Ioan Cuza" Publishing House, Iași, 2006-2007.
+
 ## Contributors
+
+This project was completed by Lepadatu Tudor in cooperation with Lect.univ.dr. Ştefania NIŢĂ
