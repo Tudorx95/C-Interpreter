@@ -9,6 +9,7 @@ An example of C interpreter language using FLEX and BISON.
 - [C-Interpreter Functionalities](#C-Interpreter-Functionalities)
 - [Terminal Experience](#Terminal-Experience)
 - [Usage](#usage)
+- [TODO](#todo)
 - [Bibliography](#bibliography)
 - [Contributors](#contributors)
 
@@ -95,6 +96,10 @@ After the command "run <program_name>" the user must press enter to return to th
 is "program.c" file. To run the interpreter with this file just tap "run program.c".
 After the pressing enter, the user can return to the menu by pressing CTRL-C command (SIGINT signal that is handled) and then press enter.
 The program can be stopped only with "exit" command.
+
+## TODO
+
+Note: Improve the function`s body to contain the stmt production rule
 
 ## Usage
 
